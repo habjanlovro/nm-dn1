@@ -1,7 +1,7 @@
 function [x, j, g, s] = iter3(M, b, x0, acc, omega)
 % iter3 - iterative methods for tridiagonal matrices
-    [xj, j] = jacobi(M, b, x0, acc);
-    [xg, g] = gaussSeidel(M, b, x0, acc);
+    [~, j] = jacobi(M, b, x0, acc);
+    [~, g] = gaussSeidel(M, b, x0, acc);
     [x, s] = sor(M, b, x0, acc, omega);
 end
 
@@ -15,6 +15,7 @@ function [x, numIters] = jacobi(M, b, x0, acc)
         xShiftRight = circshift(x, -1);
         
         x = (b - M(:, 1) .* xShiftLeft - M(:, 3) .* xShiftRight) ./ M(:, 2);
+
         numIters = numIters + 1;
     end
 end
@@ -31,6 +32,7 @@ function [x, numIters] = gaussSeidel(M, b, x0, acc)
             x(i) = (b(i) - M(i, 1) * x(i - 1) - M(i, 3) * x(i + 1)) ./ M(i, 2);
         end
         x(end) = (b(end) - M(end, 1) * x(end - 1)) ./ M(end, 2);
+        
         numIters = numIters + 1;
     end
 end
