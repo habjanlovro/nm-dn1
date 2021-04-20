@@ -1,5 +1,10 @@
 function [x, j, g, s] = iter3(M, b, x0, acc, omega)
-% iter3 - iterative methods for tridiagonal matrices
+% iter3 Iterative methods for tridiagonal matrices
+% Implemented methods are: Jacobian, Gauss-Seidel and SOR methods
+% arguments:
+%   M - matrix of the system, represented as [n x 3]
+%   b - right side of the system
+
     [~, j] = jacobi(M, b, x0, acc);
     [~, g] = gaussSeidel(M, b, x0, acc);
     [x, s] = sor(M, b, x0, acc, omega);
@@ -47,7 +52,7 @@ function [x, numIters] = sor(M, b, x0, acc, omega)
         for i = 2 : len - 1
             x(i) = (omega / M(i, 2)) * (b(i) - M(i, 1) * x(i - 1) - M(i, 3) * x(i + 1)) + (1 - omega) * x(i);
         end
-        x(end) = (omega / M(end, 2)) * (b(end) - M(end, 1) * x(end - 1)) + (1 - omega) * x(1);
+        x(end) = (omega / M(end, 2)) * (b(end) - M(end, 1) * x(end - 1)) + (1 - omega) * x(end);
         
         numIters = numIters + 1;
     end

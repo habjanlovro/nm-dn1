@@ -1,40 +1,68 @@
 % test 1
-disp("Test 1")
-M = [0 2 -1; -1 2 -1; -1 2 -1; -1 2 0]
-b = [1 0 0 1]'
-x0 = [0 0 0 0]'
-omega = 2
-acc = 1e-6;
-[x, j, g, s] = iter3(M, b, x0, acc, omega)
+disp("Test 1 - small matrix")
+A1 = [4 1 0 0; 1 5 -1 0; 0 -1 6 3; 0 0 3 7];
+M1 = [0 4 1; 1 5 -1; -1 6 3; 3 7 0]
+b1 = [1 2 3 4]';
+disp("Expected x:")
+x1 = A1 \ b1
+x10 = [0 0 0 0]'
+omega1 = 1.1
+acc1 = 1e-13;
+[x1, j1, g1, s1] = iter3(M1, b1, x10, acc1, omega1)
 
-omega = 0.1;
-allOmega = [] * 100;
-allS = [] * 100;
-for i = 1 : 100;
-    allOmega(i) = omega;
-    [~, ~, ~, s] = iter3(M, b, x0, acc, omega);
-    allS(i) = s;
-    omega = omega + 0.05;
-end
+f1 = @(o) iter3(M1, b1, x10, acc1, o);
+
+[allOmega1, allS1] = measure_omega(f1, 0.1, 30, 0.05);
 
 figure(1)
-plot(allOmega, allS);
+plot(allOmega1, allS1);
+title("Example 1");
+xlabel("Values of omega");
+ylabel("Number of iterations");
 
-allJ = [] * 15;
-allG = [] * 15;
-allS = [] * 15;
-allAcc = [] * 15;
-for i = 1 : 15
-    acc = 10^(-i);
-    [~, j, g, s] = iter3(M, b, x0, acc, 1.5);
-    allJ(i) = j;
-    allG(i) = g;
-    allS(i) = s;
-    allAcc(i) = acc;
-end
+% test 2
+disp("Test 2 - big Laplace matrix")
+n = 10^6;
+M2 = zeros(n, 3);
+M2(:, 1) = -1;
+M2(:, 2) = 2;
+M2(:, 3) = -1;
+M2(1, 1) = 0;
+M2(end, end) = 0;
+
+b2 = zeros(n, 1);
+b2(1) = 1;
+b2(end) = 1;
+
+x20 = zeros(n, 1);
+
+omega2 = 1;
+
+tic
+[x2, j2, g2, s2] = iter3(M2, b2, x20, 1e-3, 1.7);
+toc
+j2
+g2
+s2
+
+f2 = @(o) iter3(M2, b2, x20, 1e-3, o);
+[allOmega2, allS2] = measure_omega(f2, 0.5, 14, 0.1);
 
 figure(2)
-plot(allAcc, allJ, 'r');
-hold on
-plot(allAcc, allG, 'g');
-plot(allAcc, allS, 'b');
+plot(allOmega2, allS2);
+title("Example 2");
+xlabel("Values of omega");
+ylabel("Number of iterations");
+
+
+function [allOmega, allS] = measure_omega(f, startValue, numIterations, increment)
+    omega = startValue;
+    allOmega = [] * numIterations;
+    allS = [] * numIterations;
+    for i = 1 : numIterations
+        allOmega(i) = omega;
+        [~, ~, ~, s] = f(omega);
+        allS(i) = s;
+        omega = omega + increment;
+    end
+end

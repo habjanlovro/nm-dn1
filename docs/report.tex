@@ -90,80 +90,123 @@ accuracy:
 All three methods are implemented in \textit{iter3.m} file. We count the number
 of iterations for each method.
 
+We tested our implementation with two examples. The test code is located in
+\textit{test.m} file.
+
+\subsection{Example 1 - small matrix}
+
 We tested our implementation with the following system:
 \begin{equation*}
 		A = \begin{bmatrix}
-	2 & -1 & 0 & 0 \\
-	-1 & 2 & -1 & 0 \\
-	0 & -1 & 2 & -1 \\
-	0 & 0 & -1 & 2
+	4 & 1 & 0 & 0 \\
+	1 & 5 & -1 & 0 \\
+	0 & -1 & 6 & 3 \\
+	0 & 0 & 3	 & 7
 	\end{bmatrix}
 \end{equation*}
 which takes the form:
 \begin{equation*}
 	M = \begin{bmatrix}
+		0 & 4 & 1 \\
+		1 & 5 & -1 \\
+		-1 & 6 & 3 \\
+		3 & 7 & 0
+	\end{bmatrix}
+\end{equation*}
+Where $\mathbf{b}$ and solution $x$ is:
+\begin{align*}
+	\mathbf{b} = \begin{bmatrix}
+		1 \\ 2 \\ 3 \\ 4
+	\end{bmatrix}
+	&
+	x = \begin{bmatrix}
+			0.1386 \\ 0.4457 \\ 0.3673 \\ 0.4140
+	\end{bmatrix}
+\end{align*}
+
+Our initial guess is $x0 = \begin{bmatrix}
+	0 & 0 & 0 & 0
+\end{bmatrix}^T$. With $\omega = 1.5$ our implementation gives the following results:
+
+\begin{lstlisting}
+>> [x, j, g, s] = iter3(M, b, x0, 1e-13, 1.5)
+x = [0.1386, 0.4457, 0.3673, 0.4140]
+j = 46
+g = 23
+s = 46
+\end{lstlisting}
+
+We expirimentally determined the optimal value of $\omega$ by trying different
+values from interval $(0, 2)$. Figure \ref{fig:1-omega} shows the results. We
+see that the optimal value is $\omega = 1.1$.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{pics/test1-omega.jpg}
+	\caption{Number of iterations for SOR method with different values of
+		$\omega$ for example 1}
+	\label{fig:1-omega}
+\end{figure}
+
+
+\subsection{Example 2 - big Laplace matrix}
+
+For a bigger example we used a big Laplace matrix $A \in \mathbb{R}^{10^6 \times
+10^6}$. Because of how we store the matrix it is only of size $10^6 \times 3$ of
+form:
+
+\begin{equation*}
+	M = \begin{bmatrix}
 		0 & 2 & -1 \\
 		-1 & 2 & -1 \\
+		-1 & 2 & -1 \\
+		\vdots & \vdots & \vdots \\
 		-1 & 2 & -1 \\
 		-1 & 2 & 0
 	\end{bmatrix}
 \end{equation*}
-We define the solution and the initial guess as:
-\begin{align*}
+
+right side is:
+\begin{equation*}
 	\mathbf{b} = \begin{bmatrix}
-		1 \\ 0 \\ 0 \\ 1
-	\end{bmatrix}
-	&
+		1 & 0 & 0 & \cdots & 0 & 1
+	\end{bmatrix}^T
+\end{equation*}
+and the solution is:
+\begin{equation*}
+	x = \begin{bmatrix}
+		1 & 1 & \cdots & 1 & 1
+	\end{bmatrix}^T
+\end{equation*}
+
+Our initial guess is:
+\begin{equation*}
 	x_0 = \begin{bmatrix}
-		0 \\ 0 \\ 0 \\ 0
-	\end{bmatrix}
-\end{align*}
+		0 & 0 & \cdots & 0 & 0
+	\end{bmatrix}^T
+\end{equation*}
 
-If we set $\omega = 1$, we get the same number of iterations as for the
-Gauss-Seidel method. Example for $\omega = 1.3$:
-
-\begin{lstlisting}
->> [x, j, g, s] = iter3(M, b, x0, 1e-6, 1.3)
-x = [1.0000; 1.0000; 1.0000; 1.0000]
-j = 62
-g = 33
-s = 19
-\end{lstlisting}
-
-With higher precision:
+Our function returns the following:
 
 \begin{lstlisting}
->> [x, j, g, s] = iter3(M, b, x0, 1e-13, 2)
-x = [1; 1; 1; 1]
-j = 138
-g = 71
-s = 1
+>> tic
+>> [x, j, g, s] = iter3(M, b, x0, 1e-3, 1.7)
+>> toc
+Elapsed time is 35.683779 seconds.
+j = 967
+g = 254
+s = 59
 \end{lstlisting}
 
-Different values of $\omega$ are shown in figure \ref{fig:1-omega}. The optimal
-value occurs at $\omega = 2$ followed by a big spike.
-
-Figure \ref{fig:1-acc} shows the number of iterations in respect to desired
-accuracy for all three methods. For SOR method we used $\omega = 1.5$. We see
-that Jacobian method performs the worst, with exponential growth of iterations
-for all methods when the accuracy approaches 0.
-
-The test code is located in \textit{test.m} file.
+We experimentally determined that the value $\omega = 1.7$ is optimal, as is
+shown in figure \ref{fig:2-omega}.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\linewidth]{pics/test1omega.jpg}
-	\caption{Number of iterations for SOR method with different values of $\omega$}
-	\label{fig:1-omega}
+	\includegraphics[width=\linewidth]{pics/test2-omega.jpg}
+	\caption{Number of iterations for SOR method with different values of
+		$\omega$ for example 2}
+	\label{fig:2-omega}
 \end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\linewidth]{pics/test1-acc.jpg}
-	\caption{Number of iterations for Jacobian, Gauss-Seidel and SOR method with
-		different values of accuracy}
-	\label{fig:1-acc}
-\end{figure}
-
 
 \end{document}
