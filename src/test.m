@@ -10,15 +10,14 @@ omega1 = 1.1
 acc1 = 1e-13;
 [x1, j1, g1, s1] = iter3(M1, b1, x10, acc1, omega1)
 
-f1 = @(o) iter3(M1, b1, x10, acc1, o);
+%f1 = @(o) iter3(M1, b1, x10, acc1, o);
+%[allOmega1, allS1] = measure_omega(f1, 0.1, 30, 0.05);
 
-[allOmega1, allS1] = measure_omega(f1, 0.1, 30, 0.05);
-
-figure(1)
-plot(allOmega1, allS1);
-title("Example 1");
-xlabel("Values of omega");
-ylabel("Number of iterations");
+%figure(1)
+%plot(allOmega1, allS1);
+%title("Example 1");
+%xlabel("Values of omega");
+%ylabel("Number of iterations");
 
 % test 2
 disp("Test 2 - big Laplace matrix")
@@ -45,14 +44,14 @@ j2
 g2
 s2
 
-f2 = @(o) iter3(M2, b2, x20, 1e-3, o);
-[allOmega2, allS2] = measure_omega(f2, 0.5, 14, 0.1);
+%f2 = @(o) iter3(M2, b2, x20, 1e-3, o);
+%[allOmega2, allS2] = measure_omega(f2, 0.5, 14, 0.1);
 
-figure(2)
-plot(allOmega2, allS2);
-title("Example 2");
-xlabel("Values of omega");
-ylabel("Number of iterations");
+%figure(2)
+%plot(allOmega2, allS2);
+%title("Example 2");
+%xlabel("Values of omega");
+%ylabel("Number of iterations");
 
 
 function [allOmega, allS] = measure_omega(f, startValue, numIterations, increment)
